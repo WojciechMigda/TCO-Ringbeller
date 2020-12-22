@@ -7,15 +7,17 @@ set(APP main)
 add_executable( ${APP} "src/dummy.cpp" )
 target_sources( ${APP} PRIVATE
   "src/main.cpp"
-  "src/do_at_ok.cpp"
-  "src/do_ati.cpp"
-  "src/do_at_cops.cpp"
+  "src/cli.cpp"
 
-  "src/do_receive_sms.cpp"
-  "src/do_send_sms.cpp"
+#  "src/do_at_ok.cpp"
+#  "src/do_ati.cpp"
+#  "src/do_at_cops.cpp"
 
-  "src/do_receive_vcall.cpp"
-  "src/do_make_vcall.cpp"
+#  "src/do_receive_sms.cpp"
+#  "src/do_send_sms.cpp"
+
+#  "src/do_receive_vcall.cpp"
+#  "src/do_make_vcall.cpp"
 
   "src/serial_port_setup.cpp"
 )

@@ -1,0 +1,8 @@
+https://github.com/LoopPerfect/neither
+
+Author: Gaetano Checinski <Gaetano.Checinski@gmail.com>
+Date:   Thu Oct 31 09:00:25 2019 +0000
+
+    Merge pull request #30 from tmattha/feature/store_unique_ptrs
+    
+    Support for non-copyable objects in lvalues
