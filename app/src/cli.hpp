@@ -94,7 +94,11 @@ struct Cli
 
     Cli();
 
-    static neither::Either<std::string, Cli> parse(int const argc, char * argv[]);
+    static
+    neither::Either<std::string, Cli> parse(
+        char const * const * begin,
+        char const * const * end,
+        char const * argv0);
 };
 
 

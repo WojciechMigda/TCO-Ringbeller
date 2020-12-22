@@ -12,13 +12,13 @@
 //#include "clipp.hpp"
 #include "spdlog/spdlog.h"
 #include "fmt/format.h"
-#include "serial_port_setup.hpp"
+//#include "serial_port_setup.hpp"
 
-#include <boost/asio/serial_port.hpp>
+//#include <boost/asio/serial_port.hpp>
 
 //#include <iostream>
 //#include <optional>
-#include <string>
+//#include <string>
 
 
 /*
@@ -47,7 +47,7 @@ static void set_log_level(bool verbose, bool debug, bool trace)
 
 int main(int argc, char **argv)
 {
-    auto rv = Cli::parse(argc, argv)
+    auto rv = Cli::parse(argv + 1, argv + argc, argv[0])
         .leftMap([](auto && usage)
             {
                 fmt::print("{}", usage);

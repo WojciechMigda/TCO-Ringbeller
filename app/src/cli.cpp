@@ -25,7 +25,8 @@ Cli::Cli() : sms_text("Feel the bern!")
 }
 
 
-neither::Either<std::string, Cli> Cli::parse(int const argc, char * argv[])
+neither::Either<std::string, Cli>
+Cli::parse(char const * const * begin, char const * const * end, char const * argv0)
 {
     using rv_type = neither::Either<std::string, Cli>;
 
@@ -68,14 +69,14 @@ neither::Either<std::string, Cli> Cli::parse(int const argc, char * argv[])
 
     auto schema = (clipp::one_of(at_ok, ati/*, at_cops, receive_sms, send_sms, make_call, receive_call*/), common);
 
-    if (clipp::parse(argc, argv, schema))
+    if (clipp::parse(begin, end, schema))
     {
         return rv_type::rightOf(cli);
     }
     else
     {
         std::stringstream ss;
-        ss << clipp::make_man_page(schema, argv[0]);
+        ss << clipp::make_man_page(schema, argv0);
 
         return rv_type::leftOf(ss.str());
     }
