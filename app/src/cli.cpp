@@ -1,8 +1,11 @@
 #include "cli.hpp"
+#include "formatters.hpp"
 
 #include "neither/either.hpp"
 #include "clipp.hpp"
 #include "fmt/format.h"
+
+#include <boost/asio/serial_port.hpp>
 
 #include <string>
 #include <sstream>
@@ -31,6 +34,24 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
     using rv_type = neither::Either<std::string, Cli>;
 
     Cli cli;
+    auto baud_rate_setter = [&cli](std::string const & s){ cli.maybe_baud_rate = boost::asio::serial_port::baud_rate(std::stoi(s)); };
+    auto flow_control_setter = [&cli](std::string const & s)
+    {
+        using flow_control = boost::asio::serial_port::flow_control;
+
+        if (s == "none")
+        {
+            cli.maybe_flow_control = flow_control(flow_control::none);
+        }
+        else if (s == "hw")
+        {
+            cli.maybe_flow_control = flow_control(flow_control::hardware);
+        }
+        else if (s == "sw")
+        {
+            cli.maybe_flow_control = flow_control(flow_control::software);
+        }
+    };
 
     auto at_ok = (
         clipp::command("at_ok").set(cli.do_at_ok, true).doc("Execute AT/OK scenario (synchronous API)")
@@ -44,12 +65,12 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
         clipp::required("--device").doc("Modem device path") & clipp::value("Path to the modem device", cli.device),
 
         // modem params
-//        clipp::option("--baud-rate").doc("Set new baud rate on device, default=" + to_string(maybe_baud_rate))
-//            & clipp::integer("New baud rate to set").call(baud_rate_setter),
-//        clipp::option("--flow-control").doc("Set new flow control on device, default=" + to_string(maybe_flow_control))
-//            & (clipp::required("none").call(flow_control_setter)
-//                | clipp::required("sw").call(flow_control_setter)
-//                | clipp::required("hw").call(flow_control_setter)),
+        clipp::option("--baud-rate").doc("Set new baud rate on device, default=" + to_string(cli.maybe_baud_rate))
+            & clipp::integer("New baud rate to set").call(baud_rate_setter),
+        clipp::option("--flow-control").doc("Set new flow control on device, default=" + to_string(cli.maybe_flow_control))
+            & (clipp::required("none").call(flow_control_setter)
+                | clipp::required("sw").call(flow_control_setter)
+                | clipp::required("hw").call(flow_control_setter)),
 //        clipp::option("--parity").doc("Set new parity on device, default=" + to_string(maybe_parity))
 //            & (clipp::required("none").call(parity_setter)
 //                | clipp::required("odd").call(parity_setter)

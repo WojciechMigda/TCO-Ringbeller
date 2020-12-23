@@ -31,27 +31,7 @@ struct Cli
     std::string device;
 
     std::optional<boost::asio::serial_port::baud_rate> maybe_baud_rate;
-//    auto baud_rate_setter = [&maybe_baud_rate](std::string const & s){ maybe_baud_rate = boost::asio::serial_port::baud_rate(std::stoi(s)); };
-
     std::optional<boost::asio::serial_port::flow_control> maybe_flow_control;
-//    auto flow_control_setter = [&maybe_flow_control](std::string const & s)
-//    {
-//        using flow_control = boost::asio::serial_port::flow_control;
-//
-//        if (s == "none")
-//        {
-//            maybe_flow_control = flow_control(flow_control::none);
-//        }
-//        else if (s == "hw")
-//        {
-//            maybe_flow_control = flow_control(flow_control::hardware);
-//        }
-//        else if (s == "sw")
-//        {
-//            maybe_flow_control = flow_control(flow_control::software);
-//        }
-//    };
-
     std::optional<boost::asio::serial_port::parity> maybe_parity;
 //    auto parity_setter = [&maybe_parity](std::string const & s)
 //    {
