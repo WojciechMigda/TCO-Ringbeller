@@ -52,6 +52,41 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
             cli.maybe_flow_control = flow_control(flow_control::software);
         }
     };
+    auto parity_setter = [&cli](std::string const & s)
+    {
+        using parity = boost::asio::serial_port::parity;
+
+        if (s == "none")
+        {
+            cli.maybe_parity = parity(parity::none);
+        }
+        else if (s == "odd")
+        {
+            cli.maybe_parity = parity(parity::odd);
+        }
+        else if (s == "even")
+        {
+            cli.maybe_parity = parity(parity::even);
+        }
+    };
+    auto stop_bits_setter = [&cli](std::string const & s)
+    {
+        using stop_bits = boost::asio::serial_port::stop_bits;
+
+        if (s == "one")
+        {
+            cli.maybe_stop_bits = stop_bits(stop_bits::one);
+        }
+        else if (s == "onepointfive")
+        {
+            cli.maybe_stop_bits = stop_bits(stop_bits::onepointfive);
+        }
+        else if (s == "two")
+        {
+            cli.maybe_stop_bits = stop_bits(stop_bits::two);
+        }
+    };
+    auto character_size_setter = [&cli](std::string const & s){ cli.maybe_character_size = boost::asio::serial_port::character_size(std::stoi(s)); };
 
     auto at_ok = (
         clipp::command("at_ok").set(cli.do_at_ok, true).doc("Execute AT/OK scenario (synchronous API)")
@@ -71,16 +106,16 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
             & (clipp::required("none").call(flow_control_setter)
                 | clipp::required("sw").call(flow_control_setter)
                 | clipp::required("hw").call(flow_control_setter)),
-//        clipp::option("--parity").doc("Set new parity on device, default=" + to_string(maybe_parity))
-//            & (clipp::required("none").call(parity_setter)
-//                | clipp::required("odd").call(parity_setter)
-//                | clipp::required("even").call(parity_setter)),
-//        clipp::option("--stop-bits").doc("Set new stop bits on device, default=" + to_string(maybe_stop_bits))
-//            & (clipp::required("one").call(stop_bits_setter)
-//                | clipp::required("onepointfive").call(stop_bits_setter)
-//                | clipp::required("two").call(stop_bits_setter)),
-//        clipp::option("--character-size").doc("Set new character size on device, default=" + to_string(maybe_character_size))
-//            & clipp::integer("New character size to set").call(character_size_setter),
+        clipp::option("--parity").doc("Set new parity on device, default=" + to_string(cli.maybe_parity))
+            & (clipp::required("none").call(parity_setter)
+                | clipp::required("odd").call(parity_setter)
+                | clipp::required("even").call(parity_setter)),
+        clipp::option("--stop-bits").doc("Set new stop bits on device, default=" + to_string(cli.maybe_stop_bits))
+            & (clipp::required("one").call(stop_bits_setter)
+                | clipp::required("onepointfive").call(stop_bits_setter)
+                | clipp::required("two").call(stop_bits_setter)),
+        clipp::option("--character-size").doc("Set new character size on device, default=" + to_string(cli.maybe_character_size))
+            & clipp::integer("New character size to set").call(character_size_setter),
 
 
         clipp::option("--verbose", "-v").set(cli.verbose, true).doc("Enable verbose output, default=" + fmt::format("{}", cli.verbose)),
