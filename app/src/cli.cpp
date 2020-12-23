@@ -23,8 +23,69 @@ std::string to_string(std::optional<T> const & v, std::string const & none = "(e
 
 
 
-Cli::Cli() : sms_text("Feel the bern!")
+Cli::Cli()
+: sms_text("Feel the bern!")
 {
+}
+
+
+static
+void flow_control_setter(Cli & cli, std::string const s)
+{
+    using flow_control = boost::asio::serial_port::flow_control;
+
+    if (s == "none")
+    {
+        cli.maybe_flow_control = flow_control(flow_control::none);
+    }
+    else if (s == "hw")
+    {
+        cli.maybe_flow_control = flow_control(flow_control::hardware);
+    }
+    else if (s == "sw")
+    {
+        cli.maybe_flow_control = flow_control(flow_control::software);
+    }
+}
+
+
+static
+void parity_setter(Cli & cli, std::string const s)
+{
+    using parity = boost::asio::serial_port::parity;
+
+    if (s == "none")
+    {
+        cli.maybe_parity = parity(parity::none);
+    }
+    else if (s == "odd")
+    {
+        cli.maybe_parity = parity(parity::odd);
+    }
+    else if (s == "even")
+    {
+        cli.maybe_parity = parity(parity::even);
+    }
+}
+
+
+static
+void stop_bits_setter(Cli & cli, std::string const s)
+{
+    using stop_bits = boost::asio::serial_port::stop_bits;
+
+    if (s == "one")
+    {
+        cli.maybe_stop_bits = stop_bits(stop_bits::one);
+    }
+    else if (s == "onepointfive")
+    {
+        cli.maybe_stop_bits = stop_bits(stop_bits::onepointfive);
+    }
+    else if (s == "two")
+    {
+        cli.maybe_stop_bits = stop_bits(stop_bits::two);
+    }
 }
 
 
@@ -35,57 +96,9 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
 
     Cli cli;
     auto baud_rate_setter = [&cli](std::string const & s){ cli.maybe_baud_rate = boost::asio::serial_port::baud_rate(std::stoi(s)); };
-    auto flow_control_setter = [&cli](std::string const & s)
-    {
-        using flow_control = boost::asio::serial_port::flow_control;
-
-        if (s == "none")
-        {
-            cli.maybe_flow_control = flow_control(flow_control::none);
-        }
-        else if (s == "hw")
-        {
-            cli.maybe_flow_control = flow_control(flow_control::hardware);
-        }
-        else if (s == "sw")
-        {
-            cli.maybe_flow_control = flow_control(flow_control::software);
-        }
-    };
-    auto parity_setter = [&cli](std::string const & s)
-    {
-        using parity = boost::asio::serial_port::parity;
-
-        if (s == "none")
-        {
-            cli.maybe_parity = parity(parity::none);
-        }
-        else if (s == "odd")
-        {
-            cli.maybe_parity = parity(parity::odd);
-        }
-        else if (s == "even")
-        {
-            cli.maybe_parity = parity(parity::even);
-        }
-    };
-    auto stop_bits_setter = [&cli](std::string const & s)
-    {
-        using stop_bits = boost::asio::serial_port::stop_bits;
-
-        if (s == "one")
-        {
-            cli.maybe_stop_bits = stop_bits(stop_bits::one);
-        }
-        else if (s == "onepointfive")
-        {
-            cli.maybe_stop_bits = stop_bits(stop_bits::onepointfive);
-        }
-        else if (s == "two")
-        {
-            cli.maybe_stop_bits = stop_bits(stop_bits::two);
-        }
-    };
+    auto flow_control_setter = [&cli](std::string const & s){ ::flow_control_setter(cli, s); };
+    auto parity_setter = [&cli](std::string const & s){ ::parity_setter(cli, s); };
+    auto stop_bits_setter = [&cli](std::string const & s){ ::stop_bits_setter(cli, s); };
     auto character_size_setter = [&cli](std::string const & s){ cli.maybe_character_size = boost::asio::serial_port::character_size(std::stoi(s)); };
 
     auto at_ok = (

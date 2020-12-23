@@ -7,18 +7,9 @@
 //#include "do_receive_vcall.hpp"
 
 #include "cli.hpp"
-//#include "formatters.hpp"
 
-//#include "clipp.hpp"
 #include "spdlog/spdlog.h"
 #include "fmt/format.h"
-//#include "serial_port_setup.hpp"
-
-//#include <boost/asio/serial_port.hpp>
-
-//#include <iostream>
-//#include <optional>
-//#include <string>
 
 
 /*
