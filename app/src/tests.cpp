@@ -21,7 +21,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -34,7 +34,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -47,7 +47,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -63,12 +63,25 @@ suite CLI = []
                 ok = ok && cli.do_at_ok;
                 ok = ok && cli.device == "/dev/ttyUSB1312";
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
+};
+
+
+"reject at_ok without device"_test = []
+{
+    auto const args = {"at_ok"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
 };
 
 
@@ -85,12 +98,12 @@ suite CLI = []
                 ok = ok && cli.device == "/dev/ttyUSB1312";
                 ok = ok && cli.verbose;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -107,12 +120,12 @@ suite CLI = []
                 ok = ok && cli.device == "/dev/ttyUSB1312";
                 ok = ok && cli.verbose;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -129,12 +142,12 @@ suite CLI = []
                 ok = ok && cli.device == "/dev/ttyUSB1312";
                 ok = ok && cli.verbose;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -151,12 +164,12 @@ suite CLI = []
                 ok = ok && cli.device == "/dev/ttyUSB1312";
                 ok = ok && cli.debug;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -173,12 +186,12 @@ suite CLI = []
                 ok = ok && cli.device == "/dev/ttyUSB1312";
                 ok = ok && cli.trace;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -197,12 +210,12 @@ suite CLI = []
                     && cli.maybe_flow_control.has_value()
                     && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::software;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -221,12 +234,12 @@ suite CLI = []
                     && cli.maybe_flow_control.has_value()
                     && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::hardware;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -245,12 +258,12 @@ suite CLI = []
                     && cli.maybe_flow_control.has_value()
                     && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::none;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -263,7 +276,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -282,12 +295,12 @@ suite CLI = []
                     && cli.maybe_parity.has_value()
                     && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::none;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -306,12 +319,12 @@ suite CLI = []
                     && cli.maybe_parity.has_value()
                     && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::odd;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -330,12 +343,12 @@ suite CLI = []
                     && cli.maybe_parity.has_value()
                     && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::even;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -348,7 +361,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -367,12 +380,12 @@ suite CLI = []
                     && cli.maybe_stop_bits.has_value()
                     && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::one;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -391,12 +404,12 @@ suite CLI = []
                     && cli.maybe_stop_bits.has_value()
                     && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::onepointfive;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -415,12 +428,12 @@ suite CLI = []
                     && cli.maybe_stop_bits.has_value()
                     && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::two;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -433,7 +446,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -452,12 +465,12 @@ suite CLI = []
                     && cli.maybe_baud_rate.has_value()
                     && cli.maybe_baud_rate->value() == 112000;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -470,7 +483,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -489,12 +502,12 @@ suite CLI = []
                     && cli.maybe_character_size.has_value()
                     && cli.maybe_character_size->value() == 7;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -507,7 +520,7 @@ suite CLI = []
         .leftMap(failure)
         .join();
 
-    expect(-1 == rv);
+    expect(-1_i == rv);
 };
 
 
@@ -548,12 +561,12 @@ suite CLI = []
                     && cli.maybe_character_size.has_value()
                     && cli.maybe_character_size->value() == 8;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
 };
 
 
@@ -569,12 +582,25 @@ suite CLI = []
                 ok = ok && cli.do_ati;
                 ok = ok && cli.device == "/dev/ttyUSB1312";
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
+};
+
+
+"reject ati without device"_test = []
+{
+    auto const args = {"ati"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
 };
 
 
@@ -591,12 +617,333 @@ suite CLI = []
                 ok = ok && cli.device == "/dev/ttyUSB1312";
                 ok = ok && cli.verbose;
 
-                return ok ? 0 : -1;
+                return ok ? 0 : 1;
             })
         .leftMap(failure)
         .join();
 
-    expect(0 == rv);
+    expect(0_i == rv);
+};
+
+
+"accept ati with modem configuration"_test = []
+{
+    auto const args = {
+        "ati",
+        "--baud-rate", "9600",
+        "--flow-control", "hw",
+        "--trace",
+        "--parity", "odd",
+        "--stop-bits", "two",
+        "--character-size", "8",
+        "--device", "/dev/ttyUSB1312"
+    };
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_ati;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.trace;
+                ok = ok
+                    && cli.maybe_baud_rate.has_value()
+                    && cli.maybe_baud_rate->value() == 9600;
+                ok = ok
+                    && cli.maybe_flow_control.has_value()
+                    && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::hardware;
+                ok = ok
+                    && cli.maybe_parity.has_value()
+                    && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::odd;
+                ok = ok
+                    && cli.maybe_stop_bits.has_value()
+                    && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::two;
+                ok = ok
+                    && cli.maybe_character_size.has_value()
+                    && cli.maybe_character_size->value() == 8;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept at+cops with device"_test = []
+{
+    auto const args = {"at+cops", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_at_cops;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"reject at+cops without device"_test = []
+{
+    auto const args = {"at+cops"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"accept at+cops with device with debug"_test = []
+{
+    auto const args = {"at+cops", "--device", "/dev/ttyUSB1312", "--debug"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_at_cops;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.debug;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept at+cops with modem configuration"_test = []
+{
+    auto const args = {
+        "at+cops",
+        "--flow-control", "sw",
+        "--baud-rate", "9600",
+        "--device", "/dev/ttyUSB1312",
+        "--parity", "even",
+        "--character-size", "8",
+        "-v",
+        "--stop-bits", "one"
+    };
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_at_cops;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.verbose;
+                ok = ok
+                    && cli.maybe_baud_rate.has_value()
+                    && cli.maybe_baud_rate->value() == 9600;
+                ok = ok
+                    && cli.maybe_flow_control.has_value()
+                    && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::software;
+                ok = ok
+                    && cli.maybe_parity.has_value()
+                    && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::even;
+                ok = ok
+                    && cli.maybe_stop_bits.has_value()
+                    && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::one;
+                ok = ok
+                    && cli.maybe_character_size.has_value()
+                    && cli.maybe_character_size->value() == 8;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept rcv-sms with device"_test = []
+{
+    auto const args = {"rcv-sms", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_rcv_sms;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"reject rcv-sms without device"_test = []
+{
+    auto const args = {"rcv-sms"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"accept rcv-sms with device with trace"_test = []
+{
+    auto const args = {"rcv-sms", "--trace", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_rcv_sms;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.trace;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept rcv-sms with modem configuration"_test = []
+{
+    auto const args = {
+        "rcv-sms",
+        "--baud-rate", "19200",
+        "--flow-control", "none",
+        "--device", "/dev/ttyUSB1312",
+        "--verbose",
+        "--parity", "even",
+        "--character-size", "8",
+        "--stop-bits", "onepointfive"
+    };
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_rcv_sms;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.verbose;
+                ok = ok
+                    && cli.maybe_baud_rate.has_value()
+                    && cli.maybe_baud_rate->value() == 19200;
+                ok = ok
+                    && cli.maybe_flow_control.has_value()
+                    && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::none;
+                ok = ok
+                    && cli.maybe_parity.has_value()
+                    && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::even;
+                ok = ok
+                    && cli.maybe_stop_bits.has_value()
+                    && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::onepointfive;
+                ok = ok
+                    && cli.maybe_character_size.has_value()
+                    && cli.maybe_character_size->value() == 8;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept send-sms with device"_test = []
+{
+    auto const args = {"send-sms", "+12124109000", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_send_sms;
+                ok = ok && cli.da == "+12124109000";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"reject send-sms without destination address"_test = []
+{
+    auto const args = {"send-sms", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"reject send-sms without device"_test = []
+{
+    auto const args = {"send-sms", "+12124109000"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"accept send-sms with sms text"_test = []
+{
+    auto const args = {"send-sms", "+12124109000", "--device", "/dev/ttyUSB1312", "--text", "Lock him up"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_send_sms;
+                ok = ok && cli.da == "+12124109000";
+                ok = ok && cli.sms_text == "Lock him up";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
 };
 
 

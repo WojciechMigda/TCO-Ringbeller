@@ -94,6 +94,8 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
 {
     using rv_type = neither::Either<std::string, Cli>;
 
+    std::string error_info;
+
     Cli cli;
     auto baud_rate_setter = [&cli](std::string const & s){ cli.maybe_baud_rate = boost::asio::serial_port::baud_rate(std::stoi(s)); };
     auto flow_control_setter = [&cli](std::string const & s){ ::flow_control_setter(cli, s); };
@@ -109,8 +111,41 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
         clipp::command("ati").set(cli.do_ati, true).doc("Execute ATI scenario (synchronous API)")
     );
 
+    auto at_cops = (
+        clipp::command("at+cops").set(cli.do_at_cops, true).doc("Execute AT+COPS=? scenario (asynchronous API)")
+    );
+
+    auto receive_sms = (
+        clipp::command("rcv-sms").set(cli.do_rcv_sms, true).doc("Wait and receive SMS")
+    );
+
+    auto send_sms = (
+        clipp::command("send-sms").set(cli.do_send_sms, true).doc("Send SMS")
+            & clipp::value("Destination address", cli.da)
+                .if_missing([&]
+                {
+                    if (cli.do_send_sms)
+                    {
+                        error_info = "Destination address is missing.";
+                    }
+                }),
+        clipp::option("--text").doc(fmt::format("Set SMS text, default=\"{}\"", cli.sms_text)) & clipp::value("SMS text to send", cli.sms_text)
+    );
+
+    auto make_call = (
+        clipp::command("make-call").set(cli.do_make_call, true).doc("Make voice call") & clipp::value("Destination address", cli.da)
+    );
+
+    auto receive_call = (
+        clipp::command("rcv-call").set(cli.do_rcv_call, true).doc("Wait and receive voice call")
+    );
+
     auto common = (
-        clipp::required("--device").doc("Modem device path") & clipp::value("Path to the modem device", cli.device),
+        clipp::required("--device").doc("Modem device path") & clipp::value("Path to the modem device", cli.device)
+            .if_missing([&]
+            {
+                ; // TODO
+            }),
 
         // modem params
         clipp::option("--baud-rate").doc("Set new baud rate on device, default=" + to_string(cli.maybe_baud_rate))
@@ -136,7 +171,7 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
         clipp::option("--trace").set(cli.trace, true).doc("Enable trace output, default=" + fmt::format("{}", cli.trace))
     );
 
-    auto schema = (clipp::one_of(at_ok, ati/*, at_cops, receive_sms, send_sms, make_call, receive_call*/), common);
+    auto schema = (clipp::one_of(at_ok, ati, at_cops, receive_sms, send_sms, make_call, receive_call), common);
 
     if (clipp::parse(begin, end, schema))
     {
@@ -147,6 +182,8 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
         std::stringstream ss;
         ss << clipp::make_man_page(schema, argv0);
 
-        return rv_type::leftOf(ss.str());
+        std::string rv = error_info.empty() ? ss.str() : fmt::format("ERROR:\n        {}\n\n{}", error_info, ss.str());
+
+        return rv_type::leftOf(rv);
     }
 }
