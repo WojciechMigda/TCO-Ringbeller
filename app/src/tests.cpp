@@ -5,8 +5,8 @@
 
 using namespace boost::ut;
 
-auto success = [](auto &&){ return 0; };
-auto failure = [](auto &&){ return -1; };
+auto success = [](auto &&) -> int { return 0; };
+auto failure = [](auto &&) -> int { return -1; };
 
 suite CLI = []
 {
@@ -937,6 +937,301 @@ suite CLI = []
                 ok = ok && cli.da == "+12124109000";
                 ok = ok && cli.sms_text == "Lock him up";
                 ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept send-sms with verbose"_test = []
+{
+    auto const args = {"send-sms", "+12124109000", "--device", "/dev/ttyUSB1312", "--verbose", "--text", "Lock him up"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_send_sms;
+                ok = ok && cli.da == "+12124109000";
+                ok = ok && cli.sms_text == "Lock him up";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.verbose;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept send-sms with modem configuration"_test = []
+{
+    auto const args = {
+        "send-sms",
+        "+16467073826",
+        "--baud-rate", "19200",
+        "--flow-control", "none",
+        "--device", "/dev/ttyUSB1312",
+        "--debug",
+        "--parity", "even",
+        "--character-size", "8",
+        "--stop-bits", "onepointfive",
+        "--text", "Lock him up"
+    };
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_send_sms;
+                ok = ok && cli.da == "+16467073826";
+                ok = ok && cli.sms_text == "Lock him up";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.debug;
+                ok = ok
+                    && cli.maybe_baud_rate.has_value()
+                    && cli.maybe_baud_rate->value() == 19200;
+                ok = ok
+                    && cli.maybe_flow_control.has_value()
+                    && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::none;
+                ok = ok
+                    && cli.maybe_parity.has_value()
+                    && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::even;
+                ok = ok
+                    && cli.maybe_stop_bits.has_value()
+                    && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::onepointfive;
+                ok = ok
+                    && cli.maybe_character_size.has_value()
+                    && cli.maybe_character_size->value() == 8;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept rcv-call with device"_test = []
+{
+    auto const args = {"rcv-call", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_rcv_call;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"reject rcv-call without device"_test = []
+{
+    auto const args = {"rcv-call"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"accept rcv-call with device with debug"_test = []
+{
+    auto const args = {"rcv-call", "--device", "/dev/ttyUSB1312", "--debug"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_rcv_call;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.debug;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept rcv-call with modem configuration"_test = []
+{
+    auto const args = {
+        "rcv-call",
+        "--character-size", "8",
+        "--baud-rate", "19200",
+        "--flow-control", "none",
+        "--trace",
+        "--device", "/dev/ttyUSB1312",
+        "--parity", "even",
+        "--stop-bits", "two"
+    };
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_rcv_call;
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.trace;
+                ok = ok
+                    && cli.maybe_baud_rate.has_value()
+                    && cli.maybe_baud_rate->value() == 19200;
+                ok = ok
+                    && cli.maybe_flow_control.has_value()
+                    && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::none;
+                ok = ok
+                    && cli.maybe_parity.has_value()
+                    && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::even;
+                ok = ok
+                    && cli.maybe_stop_bits.has_value()
+                    && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::two;
+                ok = ok
+                    && cli.maybe_character_size.has_value()
+                    && cli.maybe_character_size->value() == 8;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept make-call with device"_test = []
+{
+    auto const args = {"make-call", "+19732225287", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_make_call;
+                ok = ok && cli.da == "+19732225287";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"reject make-call without destination address"_test = []
+{
+    auto const args = {"make-call", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"reject make-call without device"_test = []
+{
+    auto const args = {"make-call", "+19732225287"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap(success)
+        .leftMap(failure)
+        .join();
+
+    expect(-1_i == rv);
+};
+
+
+"accept make-call with verbose"_test = []
+{
+    auto const args = {"make-call", "+17039302271", "-v", "--device", "/dev/ttyUSB1312"};
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_make_call;
+                ok = ok && cli.da == "+17039302271";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.verbose;
+
+                return ok ? 0 : 1;
+            })
+        .leftMap(failure)
+        .join();
+
+    expect(0_i == rv);
+};
+
+
+"accept make-call with modem configuration"_test = []
+{
+    auto const args = {
+        "make-call",
+        "+17036234678",
+        "--trace",
+        "--baud-rate", "19200",
+        "--flow-control", "sw",
+        "--parity", "even",
+        "--character-size", "6",
+        "--stop-bits", "one",
+        "--device", "/dev/ttyUSB1312"
+    };
+
+    auto rv = Cli::parse(args.begin(), args.end(), "app")
+        .rightMap([](Cli && cli)
+            {
+                bool ok = true;
+
+                ok = ok && cli.do_make_call;
+                ok = ok && cli.da == "+17036234678";
+                ok = ok && cli.device == "/dev/ttyUSB1312";
+                ok = ok && cli.trace;
+                ok = ok
+                    && cli.maybe_baud_rate.has_value()
+                    && cli.maybe_baud_rate->value() == 19200;
+                ok = ok
+                    && cli.maybe_flow_control.has_value()
+                    && cli.maybe_flow_control->value() == boost::asio::serial_port_base::flow_control::software;
+                ok = ok
+                    && cli.maybe_parity.has_value()
+                    && cli.maybe_parity->value() == boost::asio::serial_port_base::parity::even;
+                ok = ok
+                    && cli.maybe_stop_bits.has_value()
+                    && cli.maybe_stop_bits->value() == boost::asio::serial_port_base::stop_bits::one;
+                ok = ok
+                    && cli.maybe_character_size.has_value()
+                    && cli.maybe_character_size->value() == 6;
 
                 return ok ? 0 : 1;
             })

@@ -94,9 +94,10 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
 {
     using rv_type = neither::Either<std::string, Cli>;
 
-    std::string error_info;
+    std::vector<std::string> error_info;
 
     Cli cli;
+    bool has_cmd = false;
     auto baud_rate_setter = [&cli](std::string const & s){ cli.maybe_baud_rate = boost::asio::serial_port::baud_rate(std::stoi(s)); };
     auto flow_control_setter = [&cli](std::string const & s){ ::flow_control_setter(cli, s); };
     auto parity_setter = [&cli](std::string const & s){ ::parity_setter(cli, s); };
@@ -104,47 +105,50 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
     auto character_size_setter = [&cli](std::string const & s){ cli.maybe_character_size = boost::asio::serial_port::character_size(std::stoi(s)); };
 
     auto at_ok = (
-        clipp::command("at_ok").set(cli.do_at_ok, true).doc("Execute AT/OK scenario (synchronous API)")
+        clipp::command("at_ok").set(cli.do_at_ok, true).set(has_cmd, true).doc("Execute AT/OK scenario (synchronous API)")
     );
 
     auto ati = (
-        clipp::command("ati").set(cli.do_ati, true).doc("Execute ATI scenario (synchronous API)")
+        clipp::command("ati").set(cli.do_ati, true).set(has_cmd, true).doc("Execute ATI scenario (synchronous API)")
     );
 
     auto at_cops = (
-        clipp::command("at+cops").set(cli.do_at_cops, true).doc("Execute AT+COPS=? scenario (asynchronous API)")
+        clipp::command("at+cops").set(cli.do_at_cops, true).set(has_cmd, true).doc("Execute AT+COPS=? scenario (asynchronous API)")
     );
 
     auto receive_sms = (
-        clipp::command("rcv-sms").set(cli.do_rcv_sms, true).doc("Wait and receive SMS")
+        clipp::command("rcv-sms").set(cli.do_rcv_sms, true).set(has_cmd, true).doc("Wait and receive SMS")
     );
 
     auto send_sms = (
-        clipp::command("send-sms").set(cli.do_send_sms, true).doc("Send SMS")
+        clipp::command("send-sms").set(cli.do_send_sms, true).set(has_cmd, true).doc("Send SMS")
             & clipp::value("Destination address", cli.da)
                 .if_missing([&]
                 {
                     if (cli.do_send_sms)
                     {
-                        error_info = "Destination address is missing.";
+                        error_info.emplace_back("Destination address is missing.");
                     }
                 }),
         clipp::option("--text").doc(fmt::format("Set SMS text, default=\"{}\"", cli.sms_text)) & clipp::value("SMS text to send", cli.sms_text)
     );
 
     auto make_call = (
-        clipp::command("make-call").set(cli.do_make_call, true).doc("Make voice call") & clipp::value("Destination address", cli.da)
+        clipp::command("make-call").set(cli.do_make_call, true).set(has_cmd, true).doc("Make voice call") & clipp::value("Destination address", cli.da)
     );
 
     auto receive_call = (
-        clipp::command("rcv-call").set(cli.do_rcv_call, true).doc("Wait and receive voice call")
+        clipp::command("rcv-call").set(cli.do_rcv_call, true).set(has_cmd, true).doc("Wait and receive voice call")
     );
 
     auto common = (
         clipp::required("--device").doc("Modem device path") & clipp::value("Path to the modem device", cli.device)
             .if_missing([&]
             {
-                ; // TODO
+                if (has_cmd)
+                {
+                    error_info.emplace_back("Modem device path (--device) is missing.");
+                }
             }),
 
         // modem params
@@ -182,7 +186,20 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
         std::stringstream ss;
         ss << clipp::make_man_page(schema, argv0);
 
-        std::string rv = error_info.empty() ? ss.str() : fmt::format("ERROR:\n        {}\n\n{}", error_info, ss.str());
+        std::string rv;
+
+        if (not error_info.empty())
+        {
+            rv += "ERROR\n";
+
+            for (auto const & ei : error_info)
+            {
+                rv += fmt::format("        {}\n", ei);
+            }
+
+            rv += '\n';
+        }
+        rv += ss.str();
 
         return rv_type::leftOf(rv);
     }
