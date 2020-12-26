@@ -167,7 +167,11 @@ Cli::parse(char const * const * begin, char const * const * end, char const * ar
                 | clipp::required("onepointfive").call(stop_bits_setter)
                 | clipp::required("two").call(stop_bits_setter)),
         clipp::option("--character-size").doc("Set new character size on device, default=" + to_string(cli.maybe_character_size))
-            & clipp::integer("New character size to set").call(character_size_setter),
+            & clipp::one_of(
+                clipp::required("5").call(character_size_setter),
+                clipp::required("6").call(character_size_setter),
+                clipp::required("7").call(character_size_setter),
+                clipp::required("8").call(character_size_setter)),
 
 
         clipp::option("--verbose", "-v").set(cli.verbose, true).doc("Enable verbose output, default=" + fmt::format("{}", cli.verbose)),
