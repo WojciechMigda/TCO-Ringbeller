@@ -47,5 +47,5 @@ target_sources( ${APP}_tests PRIVATE
   "src/tests.cpp"
 )
 target_link_libraries( ${APP}_tests ringbeller_static cli )
-include_directories(
+target_include_directories( ${APP}_tests PRIVATE
   "$<TARGET_PROPERTY:boost::exp,MY_INCLUDE_DIRS>" )

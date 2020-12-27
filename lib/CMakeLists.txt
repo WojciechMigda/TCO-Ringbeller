@@ -18,7 +18,7 @@ endif()
 
 set(SOURCES
     src/dummy.cpp
-#    src/parser.cpp
+    src/parser.cpp
 )
 
 add_library( ringbeller_ObjLib OBJECT src/dummy.cpp )
@@ -34,10 +34,6 @@ target_include_directories(ringbeller_ObjLib
 
 target_compile_features(ringbeller_ObjLib PRIVATE cxx_rvalue_references)
 
-include_directories(
-  "$<TARGET_PROPERTY:fmt,MY_INCLUDE_DIRS>" )
-include_directories(
-  "$<TARGET_PROPERTY:spdlog,MY_INCLUDE_DIRS>" )
 target_include_directories( ringbeller_ObjLib PRIVATE ${Boost_INCLUDE_DIRS})
 
 target_compile_features( ringbeller_ObjLib
