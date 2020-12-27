@@ -2,6 +2,8 @@
 
 #include "messages/at.hpp"
 #include "messages/ati.hpp"
+#include "messages/atd.hpp"
+#include "messages/at_cmgf.hpp"
 
 #include "boost/ut.hpp"
 
@@ -88,6 +90,30 @@ suite sync_write = []
 
     expect(5_u == wb);
     expect("ATI\r\n" == s.payload);
+};
+
+
+"write works with basic command, with command & arguments"_test = []
+{
+    MockSyncWriteStream s;
+    auto const cmd = Ringbeller::make_atd("112;");
+
+    auto const wb = Ringbeller::write(s, cmd);
+
+    expect(9_u == wb);
+    expect("ATD112;\r\n" == s.payload);
+};
+
+
+"write works with 'write' command"_test = []
+{
+    MockSyncWriteStream s;
+    auto const cmd = Ringbeller::make_at_cmgf_write("1");
+
+    auto const wb = Ringbeller::write(s, cmd);
+
+    expect(11_u == wb);
+    expect("AT+CMGF=1\r\n" == s.payload);
 };
 
 
