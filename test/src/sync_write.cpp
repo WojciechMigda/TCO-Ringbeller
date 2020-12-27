@@ -10,6 +10,7 @@
 #include <boost/asio/buffers_iterator.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/asio/streambuf.hpp>
+#include <boost/asio/error.hpp>
 
 #include <string>
 #include <iterator>
@@ -34,7 +35,7 @@ buffers_to_string(ConstBufferSequence const & buffers)
 /*
  * Mock SyncWriteStream
  */
-struct MockSyncWriteStream
+struct GoodSyncWriteStream
 {
     std::string payload;
 
@@ -62,6 +63,21 @@ struct MockSyncWriteStream
 };
 
 
+/*
+ * Mock SyncWriteStream
+ */
+struct FailingSyncWriteStream
+{
+    template<typename ConstBufferSequence>
+    std::size_t write_some(ConstBufferSequence const & buffers, boost::system::error_code & ec)
+    {
+        ec = boost::asio::error::broken_pipe;
+
+        return 0;
+    }
+};
+
+
 using namespace boost::ut;
 
 
@@ -71,7 +87,7 @@ suite sync_write = []
 
 "write works with basic command, no command, no arguments"_test = []
 {
-    MockSyncWriteStream s;
+    GoodSyncWriteStream s;
     auto const cmd = Ringbeller::make_at();
 
     auto const wb = Ringbeller::write(s, cmd);
@@ -83,7 +99,7 @@ suite sync_write = []
 
 "write works with basic command, with command, no arguments"_test = []
 {
-    MockSyncWriteStream s;
+    GoodSyncWriteStream s;
     auto const cmd = Ringbeller::make_ati();
 
     auto const wb = Ringbeller::write(s, cmd);
@@ -95,7 +111,7 @@ suite sync_write = []
 
 "write works with basic command, with command & arguments"_test = []
 {
-    MockSyncWriteStream s;
+    GoodSyncWriteStream s;
     auto const cmd = Ringbeller::make_atd("112;");
 
     auto const wb = Ringbeller::write(s, cmd);
@@ -107,13 +123,35 @@ suite sync_write = []
 
 "write works with 'write' command"_test = []
 {
-    MockSyncWriteStream s;
+    GoodSyncWriteStream s;
     auto const cmd = Ringbeller::make_at_cmgf_write("1");
 
     auto const wb = Ringbeller::write(s, cmd);
 
     expect(11_u == wb);
     expect("AT+CMGF=1\r\n" == s.payload);
+};
+
+
+"write propagates error code"_test = []
+{
+    FailingSyncWriteStream s;
+    auto const cmd = Ringbeller::make_at();
+    boost::system::error_code ec;
+
+    auto const wb = Ringbeller::write(s, cmd, ec);
+
+    expect(0_u == wb);
+    expect(boost::asio::error::broken_pipe == ec.value());
+};
+
+
+"write throws on error"_test = []
+{
+    FailingSyncWriteStream s;
+    auto const cmd = Ringbeller::make_at();
+
+    expect(throws([&]{ auto const wb = Ringbeller::write(s, cmd); (void)wb; }));
 };
 
 
