@@ -46,13 +46,14 @@ auto grammar_spec = [](auto & response_setter)
     auto set_cme_error = [&](auto &){ rc_setter(Ringbeller::result_code::cme_error); };
     auto set_cms_error = [&](auto &){ rc_setter(Ringbeller::result_code::cms_error); };
     auto set_command_not_support = [&](auto &){ rc_setter(Ringbeller::result_code::command_not_support); };
-    auto set_too_many_parameters = [&](auto &){ rc_setter(Ringbeller::result_code::too_may_parameters); };
+    auto set_too_many_parameters = [&](auto &){ rc_setter(Ringbeller::result_code::too_many_parameters); };
 
     auto rc_text_setter = [&](auto & ctx)
     {
         auto val = _attr(ctx);
         StringFinalResult & final_result = std::get<StringFinalResult>(res);
         final_result.text = std::string(val.begin(), val.end());
+        response_setter(res);
     };
 
     auto prompt_setter = [&](auto &){ res = Ringbeller::prompt(); response_setter(res); };

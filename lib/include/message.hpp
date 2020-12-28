@@ -67,7 +67,7 @@ enum class result_code
     cme_error,
     cms_error,
     command_not_support,
-    too_may_parameters
+    too_many_parameters
 };
 
 
